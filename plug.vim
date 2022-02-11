@@ -48,6 +48,7 @@ let g:LanguageClient_serverCommands = {
       \ 'cpp': ['ccls'],
       \ 'cuda': ['ccls'],
       \ }
+let g:LanguageClient_settingsPath = expand('<sfile>:p:h') . '/lsp_settings.json'
 let g:ccls_close_on_jump = v:true
 let g:ccls_levels=1
 
