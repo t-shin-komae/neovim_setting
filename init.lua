@@ -6,16 +6,16 @@ vim.g.mapleader = ' '
 
 -- 1. LSP Server management
 require("aerial").setup({
-  on_attach = function(bufnr)
-    -- Toggle the aerial window with <leader>a
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>a', '<cmd>AerialToggle!<CR>', {})
-    -- Jump forwards/backwards with '{' and '}'
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '{', '<cmd>AerialPrev<CR>', {})
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '}', '<cmd>AerialNext<CR>', {})
-    -- Jump up the tree with '[[' or ']]'
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '[[', '<cmd>AerialPrevUp<CR>', {})
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', ']]', '<cmd>AerialNextUp<CR>', {})
-  end
+    on_attach = function(bufnr)
+        -- Toggle the aerial window with <leader>a
+        vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>a', '<cmd>AerialToggle!<CR>', {})
+        -- Jump forwards/backwards with '{' and '}'
+        vim.api.nvim_buf_set_keymap(bufnr, 'n', '{', '<cmd>AerialPrev<CR>', {})
+        vim.api.nvim_buf_set_keymap(bufnr, 'n', '}', '<cmd>AerialNext<CR>', {})
+        -- Jump up the tree with '[[' or ']]'
+        vim.api.nvim_buf_set_keymap(bufnr, 'n', '[[', '<cmd>AerialPrevUp<CR>', {})
+        vim.api.nvim_buf_set_keymap(bufnr, 'n', ']]', '<cmd>AerialNextUp<CR>', {})
+    end
 })
 local on_attach = function(client, bufnr)
     local bufopts = { noremap = true, silent = true, buffer = bufnr }
@@ -86,13 +86,18 @@ end })
 
 local null_ls = require('null-ls')
 require('mason-null-ls').setup()
-require('mason-null-ls').setup_handlers{
+require('mason-null-ls').setup_handlers {
     -- cpplint = function ()
     --     null_ls.register(null_ls.builtins.diagnostics.cpplint)
     -- end
 }
-null_ls.setup()
-
+null_ls.setup {
+    sources = {
+        null_ls.builtins.formatting.fprettify
+    },
+    capabilities = capabilities,
+    on_attach = on_attach
+}
 
 
 local cmp = require 'cmp'
@@ -110,7 +115,7 @@ cmp.setup {
             mode = 'symbol_text', -- show only symbol annotations
             maxwidth = 60, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
             ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-            before = function (entry, vim_item)
+            before = function(entry, vim_item)
                 vim_item.menu = entry.source.name
                 return vim_item
             end
@@ -238,7 +243,7 @@ require('gitsigns').setup()
 require('Comment').setup()
 
 local cb = require("comment-box")
-vim.keymap.set({ "n", "v"}, "<Leader>bb", cb.lbox, {})
+vim.keymap.set({ "n", "v" }, "<Leader>bb", cb.lbox, {})
 
 -- require("luasnip.loaders.from_vscode").lazy_load()
 -- opt.termguicolors = true
