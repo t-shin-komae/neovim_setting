@@ -6,6 +6,12 @@ vim.g.mapleader = ' '
 
 -- 1. LSP Server management
 require("aerial").setup({
+    layout = {
+        max_width = { 40, 0.2 },
+        width = 30,
+        min_width = { 20 },
+        default_direction = "right"
+    },
     on_attach = function(bufnr)
         -- Toggle the aerial window with <leader>a
         vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>a', '<cmd>AerialToggle!<CR>', {})
@@ -94,7 +100,15 @@ require('mason-null-ls').setup_handlers {
 }
 null_ls.setup {
     sources = {
-        null_ls.builtins.formatting.fprettify
+        null_ls.builtins.formatting.fprettify.with({
+            extra_args = {
+                "--indent", "4",
+                "--whitespace", "4",
+                "--strict-indent",
+                "--enable-decl",
+                "--case", "1", "1", "1", "0"
+            }
+        })
     },
     capabilities = capabilities,
     on_attach = on_attach
