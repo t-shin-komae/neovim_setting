@@ -55,6 +55,7 @@ local capabilities = require('cmp_nvim_lsp').update_capabilities(
 )
 local lspconfig = require('lspconfig')
 require('mason').setup()
+require('mason-lspconfig').setup()
 require('mason-lspconfig').setup_handlers({ function(server)
     local opt = {
         capabilities = capabilities,
