@@ -260,5 +260,6 @@ require('Comment').setup()
 local cb = require("comment-box")
 vim.keymap.set({ "n", "v" }, "<Leader>bb", cb.lbox, {})
 
+vim.keymap.set("n", "<Leader>e", ":Neotree filesystem toggle left<CR>")
 -- require("luasnip.loaders.from_vscode").lazy_load()
 -- opt.termguicolors = true

@@ -49,5 +49,15 @@ require("packer").startup(function()
     use 'sindrets/diffview.nvim'
     use 'lewis6991/gitsigns.nvim'
 
+    use {
+        'nvim-neo-tree/neo-tree.nvim',
+        branch = "v2.x",
+        requires = {
+            'nvim-lua/plenary.nvim',
+            'kyazdani42/nvim-web-devicons',
+            "MunifTanjim/nui.nvim",
+        }
+    }
+
     -- use "rafamadriz/friendly-snippets"
 end)
