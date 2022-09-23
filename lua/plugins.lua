@@ -15,6 +15,9 @@ require("packer").startup(function()
     use 'hrsh7th/cmp-cmdline' -- vimのコマンドライン用の補完ソース
     use 'saadparwaiz1/cmp_luasnip'
     use 'L3MON4D3/LuaSnip'
+    use 'jose-elias-alvarez/null-ls.nvim'
+    use 'jayp0521/mason-null-ls.nvim'
+    use 'stevearc/aerial.nvim'
 
 
     use 'folke/tokyonight.nvim' -- おしゃれなカラースキーム
@@ -32,14 +35,19 @@ require("packer").startup(function()
     use { 'akinsho/bufferline.nvim', tag = "v2.*" }
 
     use 'windwp/nvim-autopairs'
-    use { 'TimUntersberger/neogit', requires = 'nvim-lua/plenary.nvim' }
 
     use 'tikhomirov/vim-glsl'
 
     use 'tpope/vim-surround'
+    use 'numToStr/Comment.nvim'
+    use 'LudoPinelli/comment-box.nvim'
+
+    -- Git
     -- use 'tpope/vim-fugitive'
     -- use 'airblade/vim-gitgutter'
     use 'TimUntersberger/neogit'
     use 'sindrets/diffview.nvim'
     use 'lewis6991/gitsigns.nvim'
+
+    -- use "rafamadriz/friendly-snippets"
 end)

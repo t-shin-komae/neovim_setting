@@ -5,7 +5,18 @@ vim.g.mapleader = ' '
 
 
 -- 1. LSP Server management
-
+require("aerial").setup({
+  on_attach = function(bufnr)
+    -- Toggle the aerial window with <leader>a
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>a', '<cmd>AerialToggle!<CR>', {})
+    -- Jump forwards/backwards with '{' and '}'
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', '{', '<cmd>AerialPrev<CR>', {})
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', '}', '<cmd>AerialNext<CR>', {})
+    -- Jump up the tree with '[[' or ']]'
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', '[[', '<cmd>AerialPrevUp<CR>', {})
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', ']]', '<cmd>AerialNextUp<CR>', {})
+  end
+})
 local on_attach = function(client, bufnr)
     local bufopts = { noremap = true, silent = true, buffer = bufnr }
 
@@ -27,6 +38,7 @@ local on_attach = function(client, bufnr)
     vim.keymap.set('n', 'ge', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
     vim.keymap.set('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
     vim.keymap.set('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+    require('aerial').on_attach(client, bufnr)
 end
 
 -- Reference highlight
@@ -41,32 +53,56 @@ augroup END
 local capabilities = require('cmp_nvim_lsp').update_capabilities(
     vim.lsp.protocol.make_client_capabilities()
 )
+local lspconfig = require('lspconfig')
 require('mason').setup()
 require('mason-lspconfig').setup_handlers({ function(server)
     local opt = {
         capabilities = capabilities,
         on_attach = on_attach
     }
-    require('lspconfig')[server].setup(opt)
-end })
+    lspconfig[server].setup(opt)
 
-require('lspconfig').sumneko_lua.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    settings = {
-        Lua = {
-            diagnostics = {
-                -- Get the language server to recognize the `vim` global
-                globals = { 'vim' },
+    -- Language server specific settings
+    lspconfig.sumneko_lua.setup {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        settings = {
+            Lua = {
+                diagnostics = {
+                    -- Get the language server to recognize the `vim` global
+                    globals = { 'vim' },
+                },
             },
         },
-    },
+    }
+    lspconfig.fortls.setup {
+        cmd = {
+            "fortls", "--notify_init", "--hover_signature", "--hover_language=fortran", "--lowercase_intrinsics"
+        },
+        capabilities = capabilities,
+        on_attach = on_attach,
+    }
+end })
+
+local null_ls = require('null-ls')
+require('mason-null-ls').setup()
+require('mason-null-ls').setup_handlers{
+    -- cpplint = function ()
+    --     null_ls.register(null_ls.builtins.diagnostics.cpplint)
+    -- end
 }
+null_ls.setup()
+
 
 
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 local lspkind = require('lspkind')
+
+local has_words_before = function()
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
 
 cmp.setup {
     formatting = {
@@ -74,7 +110,10 @@ cmp.setup {
             mode = 'symbol_text', -- show only symbol annotations
             maxwidth = 60, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
             ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-
+            before = function (entry, vim_item)
+                vim_item.menu = entry.source.name
+                return vim_item
+            end
         })
     },
 
@@ -96,9 +135,18 @@ cmp.setup {
             behavior = cmp.ConfirmBehavior.Replace,
             select = true,
         },
+        ['<C-j>'] = cmp.mapping(function(fallback)
+            if luasnip.expand_or_jumpable(-1) then
+                luasnip.jump(-1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' }),
         ['<C-k>'] = cmp.mapping(function(fallback)
             if luasnip.expand_or_jumpable() then
                 luasnip.expand_or_jump()
+            elseif has_words_before() then
+                cmp.complete()
             else
                 fallback()
             end
@@ -112,6 +160,14 @@ cmp.setup {
         { name = 'buffer' },
     }),
 }
+
+-- vim.cmd("imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'")
+-- vim.cmd("inoremap <silent> <S-Tab> <cmd>lua require'luasnip'.jump(-1)<Cr>")
+-- vim.cmd("snoremap <silent> <Tab> <cmd>lua require('luasnip').jump(1)<Cr>")
+-- vim.cmd("snoremap <silent> <S-Tab> <cmd>lua require('luasnip').jump(-1)<Cr>")
+-- vim.cmd("imap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'")
+-- vim.cmd("smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'")
+
 
 cmp.setup.cmdline('/', {
     mapping = cmp.mapping.preset.cmdline(),
@@ -178,4 +234,11 @@ require('nvim-autopairs').setup {} -- ちゃんと設定しろ
 require('neogit').setup {}
 require('diffview').setup {}
 require('gitsigns').setup()
+
+require('Comment').setup()
+
+local cb = require("comment-box")
+vim.keymap.set({ "n", "v"}, "<Leader>bb", cb.lbox, {})
+
+-- require("luasnip.loaders.from_vscode").lazy_load()
 -- opt.termguicolors = true
