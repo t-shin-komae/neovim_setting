@@ -4,7 +4,7 @@ require("plugins")
 vim.g.mapleader = ' '
 
 local fortran_icon = {
-    icon = 'f',
+    icon = '',
     color = "#519aba",
     cterm_color = 67,
     name = "fortran",
