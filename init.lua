@@ -3,6 +3,19 @@ require("plugins")
 
 vim.g.mapleader = ' '
 
+local fortran_icon = {
+    icon = 'f',
+    color = "#519aba",
+    cterm_color = 67,
+    name = "fortran",
+}
+require('nvim-web-devicons').set_icon {
+    ["f90"] = fortran_icon,
+    ["f03"] = fortran_icon,
+    ["f08"] = fortran_icon,
+    ["f#"] = fortran_icon,
+    ["fortran"] = fortran_icon
+}
 
 -- 1. LSP Server management
 require("aerial").setup({
