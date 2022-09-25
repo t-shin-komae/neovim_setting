@@ -3,6 +3,50 @@ require("plugins")
 
 vim.g.mapleader = ' '
 
+local h = require('null-ls.helpers')
+
+local methods = require("null-ls.methods")
+
+local DIAGNOSTICS = methods.internal.DIAGNOSTICS
+
+-- local pattern = "(^.+)\((\d+)\): (.+) #(\d+): (.+)"
+local ifort_builtin = h.make_builtin({
+    name = "ifort",
+    method = DIAGNOSTICS,
+    filetypes = { "fortran" },
+    generator_opts = {
+        command = "ifort",
+        args = {
+            "--syntax-only",
+            "$FILENAME",
+        },
+        format = "line",
+        to_stdin = false,
+        from_stderr = true,
+        to_temp_file = true,
+        on_output = h.diagnostics.from_pattern(
+        -- "[^:]+:(%d+): (.+)  %[(.+)%/.+%] %[%d+%]",
+            "^.+%((%d+)%): (.+) #%d+: (.+)",
+            { "row", "severity", "message" },
+            {
+                severities = {
+                    ["error"] = h.diagnostics.severities["error"],
+                    -- build = h.diagnostics.severities["warning"],
+                    -- whitespace = h.diagnostics.severities["hint"],
+                    -- runtime = h.diagnostics.severities["warning"],
+                    -- legal = h.diagnostics.severities["information"],
+                    -- readability = h.diagnostics.severities["information"],
+                },
+            }
+        ),
+        check_exit_code = function(code)
+            return code >= 1
+        end,
+    },
+    factory = h.generator_factory,
+})
+
+
 local fortran_icon = {
     icon = '',
     color = "#519aba",
@@ -116,12 +160,13 @@ null_ls.setup {
         null_ls.builtins.formatting.fprettify.with({
             extra_args = {
                 "--indent", "4",
-                "--whitespace", "4",
+                "--whitespace", "3",
                 "--strict-indent",
                 "--enable-decl",
                 "--case", "1", "1", "1", "0"
             }
-        })
+        }),
+        ifort_builtin,
     },
     capabilities = capabilities,
     on_attach = on_attach
@@ -271,8 +316,7 @@ require('gitsigns').setup()
 require('Comment').setup()
 
 local cb = require("comment-box")
-vim.keymap.set({ "n", "v" }, "<Leader>bb", cb.lbox, {})
-
+vim.keymap.set({ "n", "v" }, "<Leader>bb", function() cb.cbox(20) end, {})
 vim.keymap.set("n", "<Leader>e", ":Neotree filesystem toggle left<CR>")
 -- require("luasnip.loaders.from_vscode").lazy_load()
 -- opt.termguicolors = true
