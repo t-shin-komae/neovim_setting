@@ -139,6 +139,20 @@ require('mason-lspconfig').setup_handlers({ function(server)
             },
         },
     }
+    -- lspconfig.gopls.setup {
+    --     capabilities = capabilities,
+    --     on_attach = on_attach,
+    --     settings = {
+    --         gopls = {
+    --             analyses = {
+    --                 fillstruct = true,
+    --             },
+    --             staticcheck = true,
+    --             completeUnimported = true,
+    --             usePlaceholders = true,
+    --         },
+    --     },
+    -- }
     lspconfig.fortls.setup {
         cmd = {
             "fortls", "--notify_init", "--hover_signature", "--hover_language=fortran", "--lowercase_intrinsics"
@@ -318,5 +332,5 @@ require('Comment').setup()
 local cb = require("comment-box")
 vim.keymap.set({ "n", "v" }, "<Leader>bb", function() cb.cbox(20) end, {})
 vim.keymap.set("n", "<Leader>e", ":Neotree filesystem toggle left<CR>")
--- require("luasnip.loaders.from_vscode").lazy_load()
+require("luasnip.loaders.from_vscode").lazy_load()
 -- opt.termguicolors = true

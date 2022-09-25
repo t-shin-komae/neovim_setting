@@ -59,5 +59,5 @@ require("packer").startup(function()
         }
     }
 
-    -- use "rafamadriz/friendly-snippets"
+    use "rafamadriz/friendly-snippets"
 end)
