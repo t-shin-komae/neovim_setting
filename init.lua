@@ -18,6 +18,8 @@ local ifort_builtin = h.make_builtin({
         command = "ifort",
         args = {
             "--syntax-only",
+            "-warn",
+            "all",
             "$FILENAME",
         },
         format = "line",
@@ -31,6 +33,8 @@ local ifort_builtin = h.make_builtin({
             {
                 severities = {
                     ["error"] = h.diagnostics.severities["error"],
+                    ["warning"] = h.diagnostics.severities["warning"],
+                    ["remark"] = h.diagnostics.severities["information"],
                     -- build = h.diagnostics.severities["warning"],
                     -- whitespace = h.diagnostics.severities["hint"],
                     -- runtime = h.diagnostics.severities["warning"],
@@ -250,6 +254,7 @@ cmp.setup {
         { name = 'nvim_lsp_signature_help' },
     }, {
         { name = 'buffer' },
+        { name = 'path' },
     }),
 }
 
@@ -261,17 +266,18 @@ cmp.setup {
 -- vim.cmd("smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'")
 
 
-cmp.setup.cmdline('/', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = {
-        { name = 'buffer' }
-    }
-})
+-- cmp.setup.cmdline('/', {
+--     mapping = cmp.mapping.preset.cmdline(),
+--     sources = {
+--         { name = 'buffer' }
+--     }
+-- })
 
 cmp.setup.cmdline(':', {
     mapping = cmp.mapping.preset.cmdline(),
     sources = cmp.config.sources({
-        { name = 'path' }
+        { name = 'path' },
+        { name = 'buffer' }
     }, {
         { name = 'cmdline' }
     })
@@ -299,6 +305,9 @@ vim.keymap.set('n', '<Leader>v', ':<C-u>vsplit<CR><C-w>l')
 
 vim.keymap.set('t', '<ESC>', '<C-\\><C-n>')
 
+vim.keymap.set('n', '<Tab>', 'bn')
+vim.keymap.set('n', '<S-Tab>', 'bp')
+
 
 local telescope = require('telescope.builtin')
 vim.keymap.set('n', '#ff', telescope.find_files)
@@ -319,7 +328,7 @@ require('telescope').setup {
 }
 --
 vim.cmd('colorscheme tokyonight')
--- require"fidget".setup{}
+require"fidget".setup{}
 require('lualine').setup()
 require('bufferline').setup {}
 require('nvim-autopairs').setup {} -- ちゃんと設定しろ
